@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FileText, Sparkles, Shield, Zap, Server, AlertTriangle } from 'lucide-react';
+import { Navbar } from './components/Navbar';
 import { FileUpload } from './components/FileUpload';
 import { ProcessingLoader } from './components/ProcessingLoader';
 import { ResultsDisplay } from './components/ResultsDisplay';
@@ -157,25 +158,23 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      {/* Navigation */}
+      <Navbar />
+
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="flex justify-center mb-4">
-            <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-3 rounded-2xl">
-              <FileText className="h-8 w-8 text-white" />
-            </div>
-          </div>
           <h1 className="text-4xl font-bold text-gray-800 mb-4">
-            AI Document Extractor
+            Extract Content with AI Precision
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Extract and analyze content from your documents using Google Gemini AI.
             Upload any document and get intelligent insights or structured JSON data with complex object arrays.
+            Powered by Google Gemini AI for accurate content extraction.
           </p>
           
           {/* Server Status Indicator */}
-          <div className="flex justify-center mt-4">
-            <div className={`flex items-center space-x-2 px-3 py-1 rounded-full text-sm ${
+          <div className="flex justify-center mt-6">
+            <div className={`flex items-center space-x-2 px-4 py-2 rounded-full text-sm ${
               serverStatus === 'online' 
                 ? 'bg-green-100 text-green-700' 
                 : serverStatus === 'offline'
@@ -309,7 +308,7 @@ function App() {
 
               {/* Features Grid */}
               {state === 'idle' && (
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div id="features" className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                   {features.map((feature, index) => (
                     <div
                       key={index}
@@ -359,27 +358,74 @@ function App() {
           )}
         </div>
 
-        {/* Setup Instructions */}
+        {/* How It Works Section */}
         {serverStatus === 'online' && (state === 'idle' || state === 'file-selected') && (
-          <div className="max-w-4xl mx-auto mt-12">
+          <div id="how-it-works" className="max-w-4xl mx-auto mt-16">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">How It Works</h2>
+              <p className="text-gray-600">Simple steps to extract content from your documents</p>
+            </div>
+            
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="text-center">
+                <div className="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-blue-600 font-bold">1</span>
+                </div>
+                <h3 className="font-semibold text-gray-800 mb-2">Upload Document</h3>
+                <p className="text-sm text-gray-600">Choose your document - PDF, image, or text file</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="bg-purple-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-purple-600 font-bold">2</span>
+                </div>
+                <h3 className="font-semibold text-gray-800 mb-2">Configure Extraction</h3>
+                <p className="text-sm text-gray-600">Choose general analysis or define custom fields</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="bg-green-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-green-600 font-bold">3</span>
+                </div>
+                <h3 className="font-semibold text-gray-800 mb-2">Get Results</h3>
+                <p className="text-sm text-gray-600">Receive structured data or comprehensive analysis</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Supported Formats Section */}
+        {serverStatus === 'online' && (state === 'idle' || state === 'file-selected') && (
+          <div id="supported-formats" className="max-w-4xl mx-auto mt-16">
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
               <div className="flex items-start space-x-3">
                 <Shield className="h-5 w-5 text-blue-500 mt-0.5" />
                 <div>
                   <h3 className="font-semibold text-blue-800 mb-2">
-                    Advanced Data Extraction Features
+                    Supported Document Formats
                   </h3>
                   <p className="text-blue-700 text-sm mb-3">
                     Your documents are processed securely with support for complex data structures.
                   </p>
-                  <ul className="text-sm text-blue-700 space-y-1 ml-4">
-                    <li>• Extract simple arrays (skills, tags, categories)</li>
-                    <li>• Extract complex object arrays (invoice items, work experience, education)</li>
-                    <li>• Define custom object schemas with multiple properties</li>
-                    <li>• Support for nested data structures and relationships</li>
-                    <li>• Expandable views for complex data visualization</li>
-                    <li>• Export structured data in multiple formats</li>
-                  </ul>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="font-medium text-blue-800 mb-2">Document Types:</h4>
+                      <ul className="text-sm text-blue-700 space-y-1">
+                        <li>• PDF documents</li>
+                        <li>• Images (PNG, JPG, GIF, WebP)</li>
+                        <li>• Text files (TXT, CSV, RTF, HTML)</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-blue-800 mb-2">Extraction Features:</h4>
+                      <ul className="text-sm text-blue-700 space-y-1">
+                        <li>• Simple arrays (skills, tags, categories)</li>
+                        <li>• Complex object arrays (invoice items, work experience)</li>
+                        <li>• Custom object schemas with multiple properties</li>
+                        <li>• Nested data structures and relationships</li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
