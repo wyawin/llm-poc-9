@@ -398,7 +398,7 @@ export const ExtractionConfig: React.FC<ExtractionConfigProps> = ({
           { id: '5', name: 'address', description: 'Complete registered address', type: 'text' },
           { id: '6', name: 'issuing_tax_office_kpp', description: 'KPP (Kantor Pelayanan Pajak) - Tax office that issued the card', type: 'text' },
           { id: '7', name: 'issued_date', description: 'Date when NPWP was issued', type: 'date' },
-          { id: '8', name: 'official_stamp_seal', description: 'Information about official stamps or seals present', type: 'text' },
+          // { id: '8', name: 'official_stamp_seal', description: 'Information about official stamps or seals present', type: 'text' },
           // { id: '8', name: 'qrcode', description: 'Extract information about the QR Code present', type: 'text' }
         ];
         break;
