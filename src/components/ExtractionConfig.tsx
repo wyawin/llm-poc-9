@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Plus, Trash2, Code, FileText, Download, ChevronDown, ChevronRight } from 'lucide-react';
+import { Settings, Plus, Trash2, Code, FileText, Download, ChevronDown, ChevronRight, CreditCard } from 'lucide-react';
 
 interface ExtractionField {
   id: string;
@@ -164,6 +164,90 @@ export const ExtractionConfig: React.FC<ExtractionConfigProps> = ({
     let presetFields: ExtractionField[] = [];
     
     switch (preset) {
+      case 'bank_statement':
+        presetFields = [
+          { id: '1', name: 'bank_name', description: 'Name of the bank or financial institution', type: 'text' },
+          { id: '2', name: 'account_holder_name', description: 'Name of the account holder', type: 'text' },
+          { id: '3', name: 'account_number', description: 'Bank account number (last 4 digits or masked)', type: 'text' },
+          { id: '4', name: 'account_type', description: 'Type of account (checking, savings, etc.)', type: 'text' },
+          { id: '5', name: 'statement_period_start', description: 'Statement period start date', type: 'date' },
+          { id: '6', name: 'statement_period_end', description: 'Statement period end date', type: 'date' },
+          { id: '7', name: 'opening_balance', description: 'Opening balance at start of period', type: 'number' },
+          { id: '8', name: 'closing_balance', description: 'Closing balance at end of period', type: 'number' },
+          { id: '9', name: 'total_deposits', description: 'Total amount of deposits during period', type: 'number' },
+          { id: '10', name: 'total_withdrawals', description: 'Total amount of withdrawals during period', type: 'number' },
+          { id: '11', name: 'total_fees', description: 'Total fees charged during period', type: 'number' },
+          { id: '12', name: 'interest_earned', description: 'Interest earned during period', type: 'number' },
+          { 
+            id: '13', 
+            name: 'transactions', 
+            description: 'All transactions during the statement period', 
+            type: 'array_object',
+            objectSchema: [
+              { id: '1', name: 'date', description: 'Transaction date', type: 'date' },
+              { id: '2', name: 'description', description: 'Transaction description', type: 'text' },
+              { id: '3', name: 'amount', description: 'Transaction amount (positive for deposits, negative for withdrawals)', type: 'number' },
+              { id: '4', name: 'balance', description: 'Account balance after transaction', type: 'number' },
+              { id: '5', name: 'transaction_type', description: 'Type of transaction (deposit, withdrawal, fee, etc.)', type: 'text' },
+              { id: '6', name: 'reference_number', description: 'Transaction reference or check number', type: 'text' }
+            ]
+          },
+          { 
+            id: '14', 
+            name: 'fees_breakdown', 
+            description: 'Breakdown of fees charged', 
+            type: 'array_object',
+            objectSchema: [
+              { id: '1', name: 'fee_type', description: 'Type of fee (maintenance, overdraft, etc.)', type: 'text' },
+              { id: '2', name: 'amount', description: 'Fee amount', type: 'number' },
+              { id: '3', name: 'date', description: 'Date fee was charged', type: 'date' },
+              { id: '4', name: 'description', description: 'Fee description', type: 'text' }
+            ]
+          },
+          { 
+            id: '15', 
+            name: 'direct_deposits', 
+            description: 'Direct deposits received', 
+            type: 'array_object',
+            objectSchema: [
+              { id: '1', name: 'date', description: 'Deposit date', type: 'date' },
+              { id: '2', name: 'amount', description: 'Deposit amount', type: 'number' },
+              { id: '3', name: 'source', description: 'Source of deposit (employer, government, etc.)', type: 'text' },
+              { id: '4', name: 'description', description: 'Deposit description', type: 'text' }
+            ]
+          },
+          { 
+            id: '16', 
+            name: 'checks_written', 
+            description: 'Checks written during period', 
+            type: 'array_object',
+            objectSchema: [
+              { id: '1', name: 'check_number', description: 'Check number', type: 'text' },
+              { id: '2', name: 'date', description: 'Date check cleared', type: 'date' },
+              { id: '3', name: 'amount', description: 'Check amount', type: 'number' },
+              { id: '4', name: 'payee', description: 'Check payee', type: 'text' }
+            ]
+          },
+          { 
+            id: '17', 
+            name: 'electronic_transfers', 
+            description: 'Electronic transfers (ACH, wire transfers, etc.)', 
+            type: 'array_object',
+            objectSchema: [
+              { id: '1', name: 'date', description: 'Transfer date', type: 'date' },
+              { id: '2', name: 'amount', description: 'Transfer amount', type: 'number' },
+              { id: '3', name: 'type', description: 'Transfer type (ACH, wire, etc.)', type: 'text' },
+              { id: '4', name: 'description', description: 'Transfer description', type: 'text' },
+              { id: '5', name: 'reference', description: 'Transfer reference number', type: 'text' }
+            ]
+          },
+          { id: '18', name: 'minimum_balance', description: 'Minimum balance during statement period', type: 'number' },
+          { id: '19', name: 'maximum_balance', description: 'Maximum balance during statement period', type: 'number' },
+          { id: '20', name: 'average_daily_balance', description: 'Average daily balance for the period', type: 'number' },
+          { id: '21', name: 'overdraft_occurrences', description: 'Number of overdraft occurrences', type: 'number' },
+          { id: '22', name: 'statement_date', description: 'Date the statement was generated', type: 'date' }
+        ];
+        break;
       case 'invoice':
         presetFields = [
           { id: '1', name: 'invoice_number', description: 'Invoice number', type: 'text' },
@@ -242,6 +326,80 @@ export const ExtractionConfig: React.FC<ExtractionConfigProps> = ({
               { id: '2', name: 'description', description: 'Clause description', type: 'text' }
             ]
           }
+        ];
+        break;
+      case 'family_certificate':
+        presetFields = [
+          { id: '1', name: 'document_number', description: 'Official document number or certificate ID', type: 'text' },
+          { id: '2', name: 'address', description: 'Family residence address', type: 'text' },
+          { id: '3', name: 'head_of_household_name', description: 'Name of the head of household', type: 'text' },
+          { id: '4', name: 'issue_date', description: 'Date when the certificate was issued', type: 'date' },
+          { id: '5', name: 'issuing_authority', description: 'Government office or authority that issued the certificate', type: 'text' },
+          { id: '6', name: 'village_district', description: 'Village or district (Kelurahan/Desa)', type: 'text' },
+          { id: '7', name: 'sub_district', description: 'Sub-district (Kecamatan)', type: 'text' },
+          { id: '8', name: 'city_regency', description: 'City or regency (Kota/Kabupaten)', type: 'text' },
+          { id: '9', name: 'province', description: 'Province name', type: 'text' },
+          { id: '10', name: 'postal_code', description: 'Postal code of the address', type: 'text' },
+          { 
+            id: '11', 
+            name: 'family_members', 
+            description: 'Complete list of all family members with detailed personal information', 
+            type: 'array_object',
+            objectSchema: [
+              { id: '1', name: 'member_name', description: 'Full name of family member', type: 'text' },
+              { id: '2', name: 'nik', description: 'NIK (Nomor Induk Kependudukan) or National Identification Number', type: 'text' },
+              { id: '3', name: 'gender', description: 'Gender (Male/Female or Laki-laki/Perempuan)', type: 'text' },
+              { id: '4', name: 'birth_date', description: 'Date of birth', type: 'date' },
+              { id: '5', name: 'birth_place', description: 'Place of birth (city/regency)', type: 'text' },
+              { id: '6', name: 'religion', description: 'Religious affiliation', type: 'text' },
+              { id: '7', name: 'last_education', description: 'Highest level of education completed', type: 'text' },
+              { id: '8', name: 'job_occupation', description: 'Current job or occupation', type: 'text' },
+              { id: '9', name: 'marriage_status', description: 'Marital status (Single, Married, Divorced, Widowed)', type: 'text' },
+              { id: '10', name: 'relationship_status', description: 'Relationship to head of household (Head, Spouse, Child, etc.)', type: 'text' },
+              { id: '11', name: 'citizenship', description: 'Citizenship status (Indonesian citizen, Foreign citizen, etc.)', type: 'text' },
+              { id: '12', name: 'passport_number', description: 'Passport number if applicable', type: 'text' },
+              { id: '13', name: 'kitas_kitap_number', description: 'KITAS or KITAP number for foreign residents', type: 'text' },
+              { id: '14', name: 'fathers_name', description: 'Full name of father', type: 'text' },
+              { id: '15', name: 'mothers_name', description: 'Full name of mother', type: 'text' }
+            ]
+          },
+          { id: '12', name: 'total_family_members', description: 'Total number of family members listed', type: 'number' },
+          { id: '13', name: 'certificate_validity', description: 'Validity period or expiration information', type: 'text' },
+          { id: '14', name: 'official_stamp_seal', description: 'Information about official stamps or seals present', type: 'text' },
+          { id: '15', name: 'authorized_signature', description: 'Name and title of the authorizing official', type: 'text' }
+        ];
+        break;
+      case 'ktp_id_card':
+        presetFields = [
+          { id: '1', name: 'ktp_issuing_province', description: 'Province that issued the KTP', type: 'text' },
+          { id: '2', name: 'ktp_issuing_city_regency', description: 'City or regency that issued the KTP', type: 'text' },
+          { id: '3', name: 'nik', description: 'NIK (Nomor Induk Kependudukan) - 16 digit identification number', type: 'text' },
+          { id: '4', name: 'full_name', description: 'Complete full name as written on KTP', type: 'text' },
+          { id: '5', name: 'gender', description: 'Gender (LAKI-LAKI/PEREMPUAN)', type: 'text' },
+          { id: '6', name: 'blood_type', description: 'Blood type (A, B, AB, O with Rh factor)', type: 'text' },
+          { id: '7', name: 'birth_date', description: 'Date of birth', type: 'date' },
+          { id: '8', name: 'birth_place', description: 'Place of birth (city/regency)', type: 'text' },
+          { id: '9', name: 'address', description: 'Complete address including RT/RW', type: 'text' },
+          { id: '10', name: 'religion', description: 'Religious affiliation', type: 'text' },
+          { id: '11', name: 'marriage_status', description: 'Marital status (BELUM KAWIN/KAWIN/CERAI HIDUP/CERAI MATI)', type: 'text' },
+          { id: '12', name: 'job_occupation', description: 'Job or occupation', type: 'text' },
+          { id: '13', name: 'citizenship', description: 'Citizenship status (WNI/WNA)', type: 'text' },
+          { id: '14', name: 'valid_until', description: 'KTP validity expiration date', type: 'date' },
+          { id: '15', name: 'issued_date', description: 'Date when KTP was issued', type: 'date' },
+          { id: '16', name: 'issued_city_regency', description: 'City or regency where KTP was issued', type: 'text' }
+        ];
+        break;
+      case 'npwp_tax_card':
+        presetFields = [
+          { id: '1', name: 'tax_card_number', description: 'NPWP number (formatted with dots and dashes)', type: 'text' },
+          { id: '2', name: 'tax_card_number_16_digit', description: '16-digit NPWP number without formatting. If no 16-digit NPWP number present, return null', type: 'text' },
+          { id: '3', name: 'full_name', description: 'Complete full name as registered for tax', type: 'text' },
+          { id: '4', name: 'nik', description: 'NIK (Nomor Induk Kependudukan) - identification number', type: 'text' },
+          { id: '5', name: 'address', description: 'Complete registered address', type: 'text' },
+          { id: '6', name: 'issuing_tax_office_kpp', description: 'KPP (Kantor Pelayanan Pajak) - Tax office that issued the card', type: 'text' },
+          { id: '7', name: 'issued_date', description: 'Date when NPWP was issued', type: 'date' },
+          { id: '8', name: 'official_stamp_seal', description: 'Information about official stamps or seals present', type: 'text' },
+          // { id: '8', name: 'qrcode', description: 'Extract information about the QR Code present', type: 'text' }
         ];
         break;
       default:
@@ -323,23 +481,57 @@ export const ExtractionConfig: React.FC<ExtractionConfigProps> = ({
       </div>
 
       <p className="text-sm text-gray-600">
-        Define specific fields you want to extract from your documents. The AI will return structured JSON data.
-        Use "Array of Objects" for complex data like invoice items, work experience, or contract terms.
+        Define specific fields you want to extract from your documents. The AI will return structured JSON data with confidence levels.
+        Use "Array of Objects" for complex data like transactions, line items, or detailed records.
       </p>
 
       {/* Presets */}
       <div className="space-y-2">
         <label className="text-sm font-medium text-gray-700">Quick Presets:</label>
         <div className="flex flex-wrap gap-2">
-          {['invoice', 'resume', 'contract'].map(preset => (
+          {[
+            { key: 'bank_statement', label: 'Bank Statement', icon: CreditCard },
+            { key: 'invoice', label: 'Invoice', icon: FileText },
+            { key: 'resume', label: 'Resume', icon: FileText },
+            { key: 'contract', label: 'Contract', icon: FileText },
+            { key: 'family_certificate', label: 'Family Certificate', icon: FileText }
+          ].map(({ key, label, icon: Icon }) => (
             <button
-              key={preset}
-              onClick={() => loadPreset(preset)}
-              className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors capitalize"
+              key={key}
+              onClick={() => loadPreset(key)}
+              className={`flex items-center space-x-1 px-3 py-1 text-xs rounded-md hover:bg-gray-200 transition-colors ${
+                key === 'bank_statement' 
+                  ? 'bg-blue-100 text-blue-700 border border-blue-300' 
+                  : 'bg-gray-100 text-gray-700'
+              }`}
             >
-              {preset}
+              <Icon className="h-3 w-3" />
+              <span>{label}</span>
             </button>
           ))}
+          {[
+            { key: 'ktp_id_card', label: 'KTP (ID Card)', icon: FileText },
+            { key: 'npwp_tax_card', label: 'NPWP (Tax Card)', icon: FileText }
+          ].map(({ key, label, icon: Icon }) => (
+            <button
+              key={key}
+              onClick={() => loadPreset(key)}
+              className="flex items-center space-x-1 px-3 py-1 text-xs rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+            >
+              <Icon className="h-3 w-3" />
+              <span>{label}</span>
+            </button>
+          ))}
+        </div>
+        {/* Bank Statement Description */}
+        <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded-md">
+          <strong>Bank Statement:</strong> Comprehensive extraction including account details, balances, transactions, fees, deposits, checks, and transfers with confidence scoring for financial analysis.
+          <br />
+          <strong>Family Certificate:</strong> Complete family record extraction including document details, head of household, and detailed family member information with personal, civil, and identification data.
+          <br />
+          <strong>KTP (ID Card):</strong> Complete Indonesian identification card extraction including personal details, address, civil status, and document validity information.
+          <br />
+          <strong>NPWP (Tax Card):</strong> Indonesian tax identification card extraction including tax numbers, personal information, and issuing office details.
         </div>
       </div>
 

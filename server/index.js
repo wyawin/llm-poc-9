@@ -159,7 +159,7 @@ function generateObjectSchemaDescription(objectSchema) {
   }).join('\n');
 }
 
-// Helper function to generate custom extraction prompt
+// Helper function to generate custom extraction prompt with confidence levels
 function generateCustomPrompt(customFields) {
   const fieldDescriptions = customFields.map(field => {
     let typeHint = '';
@@ -194,36 +194,130 @@ function generateCustomPrompt(customFields) {
   }).join('\n\n');
 
   return `
-    Please extract specific data from this document and return it as a valid JSON object.
+    Please extract specific data from this document and return it as a valid JSON object with confidence levels.
     
     Extract the following fields:
     ${fieldDescriptions}
     
-    Requirements:
-    1. Return ONLY a valid JSON object with the requested fields
-    2. If a field cannot be found, use null as the value
-    3. For array fields, return an empty array [] if no data is found
-    4. For boolean fields, return true/false based on the content
-    5. For date fields, use YYYY-MM-DD format
-    6. For number fields, return actual numbers, not strings
-    7. For array_object fields, return an array of objects with the specified structure
-    8. Ensure the JSON is properly formatted and parseable
-    9. Do not include any explanatory text, only the JSON object
+    CRITICAL REQUIREMENTS:
+    1. Return a JSON object with TWO main sections: "data" and "confidence"
+    2. The "data" section contains the extracted values
+    3. The "confidence" section contains confidence levels (0-100) for each field
+    4. Estimate a realistic confidence levels based on the following factors:
+       - Text clarity or ambiguity (e.g., numbers are partially missing, characters are unclear)
+       - Common patterns (e.g., date format, currency format)
+       - Field positioning or labeling consistency
+    5. For tabular data, estimate the confidence levels for each row and each field (cell) 
+    6. Confidence levels should reflect how certain you are about each extracted value:
+       - 90-100: Very confident, data clearly present and unambiguous
+       - 70-89: Confident, data present but may have minor ambiguity
+       - 50-69: Moderately confident, data inferred or partially clear
+       - 30-49: Low confidence, data unclear or heavily inferred
+       - 0-29: Very low confidence, data missing or highly uncertain
     
-    Example format for array_object:
+    Data Extraction Rules:
+    - If a field cannot be found, use null as the value and set confidence to 0
+    - For array fields, return an empty array [] if no data is found
+    - For boolean fields, return true/false based on the content
+    - For date fields, use YYYY-MM-DD format
+    - For number fields, return actual numbers, not strings
+    - For array_object fields, return an array of objects with the specified structure
+    - Each object in array_object should also have confidence levels for its properties
+    
+    Confidence Assessment Guidelines:
+    - Base confidence on clarity, explicitness, and context of the information
+    - Consider document quality, text clarity, and data completeness
+    - Be honest about uncertainty - it's better to report low confidence than guess
+    - For array_object fields, provide confidence for each object's properties
+    
+    Response Format:
     {
-      "field_name": [
-        {
-          "property1": "value1",
-          "property2": "value2"
-        },
-        {
-          "property1": "value3",
-          "property2": "value4"
-        }
-      ]
+      "data": {
+        "field1": "extracted_value",
+        "field2": ["array", "values"],
+        "field3": [
+          {
+            "property1": "value1",
+            "property2": "value2"
+          }
+        ]
+      },
+      "confidence": {
+        "field1": 85,
+        "field2": 92,
+        "field3": [
+          {
+            "property1": 78,
+            "property2": 90
+          }
+        ]
+      }
     }
+    
+    IMPORTANT: 
+    - Return ONLY the JSON object, no explanatory text
+    - Ensure the JSON is properly formatted and parseable
+    - Confidence levels must be integers between 0-100
+    - Confidence levels for tabular data, Do not assume same confidence across rows or columns. Assess each cell individually
+    - Every data field must have a corresponding confidence level
+    - For array_object fields, confidence structure must match data structure
   `;
+}
+
+// Helper function to validate confidence structure
+function validateConfidenceStructure(data, confidence) {
+  const errors = [];
+  
+  function validateRecursive(dataObj, confidenceObj, path = '') {
+    for (const key in dataObj) {
+      const currentPath = path ? `${path}.${key}` : key;
+      
+      if (!(key in confidenceObj)) {
+        errors.push(`Missing confidence for field: ${currentPath}`);
+        continue;
+      }
+      
+      const dataValue = dataObj[key];
+      const confidenceValue = confidenceObj[key];
+      
+      if (Array.isArray(dataValue)) {
+        if (dataValue.length > 0 && typeof dataValue[0] === 'object' && dataValue[0] !== null) {
+          // Array of objects
+          if (!Array.isArray(confidenceValue)) {
+            errors.push(`Confidence for ${currentPath} should be an array of objects`);
+          } else {
+            dataValue.forEach((item, index) => {
+              if (confidenceValue[index]) {
+                validateRecursive(item, confidenceValue[index], `${currentPath}[${index}]`);
+              } else {
+                errors.push(`Missing confidence for ${currentPath}[${index}]`);
+              }
+            });
+          }
+        } else {
+          // Simple array
+          if (typeof confidenceValue !== 'number' || confidenceValue < 0 || confidenceValue > 100) {
+            errors.push(`Invalid confidence value for ${currentPath}: must be 0-100`);
+          }
+        }
+      } else if (typeof dataValue === 'object' && dataValue !== null) {
+        // Nested object
+        if (typeof confidenceValue !== 'object' || Array.isArray(confidenceValue)) {
+          errors.push(`Confidence for ${currentPath} should be an object`);
+        } else {
+          validateRecursive(dataValue, confidenceValue, currentPath);
+        }
+      } else {
+        // Simple value
+        if (typeof confidenceValue !== 'number' || confidenceValue < 0 || confidenceValue > 100) {
+          errors.push(`Invalid confidence value for ${currentPath}: must be 0-100`);
+        }
+      }
+    }
+  }
+  
+  validateRecursive(data, confidence);
+  return errors;
 }
 
 // Helper function to parse JSON from AI response
@@ -306,6 +400,17 @@ app.post('/api/extract', upload.single('document'), async (req, res) => {
           Provide a clean, well-structured output that maintains the original formatting and hierarchy.
           If there are tables, lists, or structured data, preserve that structure in your response.
           Focus on accuracy and readability.
+          
+          Additionally, provide an overall confidence level (0-100) for the extraction quality based on:
+          - Document clarity and readability
+          - Text quality and completeness
+          - Structural preservation accuracy
+          
+          Format your response as:
+          CONFIDENCE: [level]
+          
+          EXTRACTED CONTENT:
+          [your extracted content here]
         `;
       } else {
         prompt = `
@@ -317,6 +422,17 @@ app.post('/api/extract', upload.single('document'), async (req, res) => {
           5. The extracted text content
           
           Format your response in a clear, organized manner with proper headings and structure.
+          
+          Additionally, provide an overall confidence level (0-100) for the analysis quality based on:
+          - Document clarity and completeness
+          - Analysis accuracy and depth
+          - Content comprehension level
+          
+          Start your response with:
+          CONFIDENCE: [level]
+          
+          ANALYSIS:
+          [your analysis here]
         `;
       }
 
@@ -335,7 +451,7 @@ app.post('/api/extract', upload.single('document'), async (req, res) => {
         generationConfig: config.geminiExtractionModel,
         config: {
           thinkingConfig: {
-            thinkingBudget: 0,
+            thinkingBudget: 1024,
           },
         },
       };
@@ -360,11 +476,41 @@ app.post('/api/extract', upload.single('document'), async (req, res) => {
       // If this was a custom extraction, try to parse JSON
       if (isCustomExtraction) {
         const jsonData = parseJsonFromResponse(response);
-        if (jsonData) {
-          responseData.jsonData = jsonData;
+        if (jsonData && jsonData.data && jsonData.confidence) {
+          // Validate confidence structure
+          const validationErrors = validateConfidenceStructure(jsonData.data, jsonData.confidence);
+          
+          if (validationErrors.length === 0) {
+            responseData.jsonData = jsonData.data;
+            responseData.confidence = jsonData.confidence;
+            responseData.hasConfidence = true;
+          } else {
+            console.warn('Confidence validation errors:', validationErrors);
+            responseData.jsonData = jsonData.data || jsonData;
+            responseData.confidence = jsonData.confidence;
+            responseData.hasConfidence = true;
+            responseData.confidenceWarnings = validationErrors;
+          }
         } else {
-          // If JSON parsing failed, still return the raw content
-          responseData.jsonParseError = 'Failed to parse JSON from AI response';
+          // Fallback: try to parse as simple JSON without confidence
+          const simpleJson = parseJsonFromResponse(extractedContent);
+          if (simpleJson) {
+            responseData.jsonData = simpleJson;
+            responseData.hasConfidence = false;
+            responseData.jsonParseError = 'AI did not provide confidence levels';
+          } else {
+            responseData.jsonParseError = 'Failed to parse JSON from AI response';
+            responseData.hasConfidence = false;
+          }
+        }
+      } else {
+        // For non-custom extractions, try to extract confidence score
+        const confidenceMatch = extractedContent.match(/CONFIDENCE:\s*(\d+)/i);
+        if (confidenceMatch) {
+          responseData.overallConfidence = parseInt(confidenceMatch[1]);
+          responseData.hasConfidence = true;
+          // Remove confidence line from content
+          responseData.content = extractedContent.replace(/CONFIDENCE:\s*\d+\s*/i, '').trim();
         }
       }
       console.log(responseData);
