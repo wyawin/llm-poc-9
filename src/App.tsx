@@ -137,7 +137,7 @@ function App() {
     {
       icon: <Sparkles className="h-6 w-6" />,
       title: "AI-Powered Extraction",
-      description: "Leverages Google Gemini AI for intelligent content extraction"
+      description: "Leverages Fineksi Lens for intelligent content extraction"
     },
     {
       icon: <FileText className="h-6 w-6" />,
@@ -169,7 +169,7 @@ function App() {
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Upload any document and get intelligent insights or structured JSON data with complex object arrays.
-            Powered by Google Gemini AI for accurate content extraction.
+            Powered by Fineksi Lens for accurate content extraction.
           </p>
           
           {/* Server Status Indicator */}
@@ -202,13 +202,8 @@ function App() {
                     Server Connection Failed
                   </h3>
                   <p className="text-red-700 text-sm mb-3">
-                    Unable to connect to the backend server. Please ensure:
+                    Unable to connect to the backend server.
                   </p>
-                  <ol className="text-sm text-red-700 space-y-1 ml-4">
-                    <li>1. The server is running (npm run dev)</li>
-                    <li>2. Your .env file contains a valid GEMINI_API_KEY</li>
-                    <li>3. The server is accessible at http://localhost:3001</li>
-                  </ol>
                   <button
                     onClick={checkServerStatus}
                     className="mt-3 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm"
@@ -395,7 +390,7 @@ function App() {
         )}
 
         {/* Supported Formats Section */}
-        {serverStatus === 'online' && (state === 'idle' || state === 'file-selected') && (
+        {/* {serverStatus === 'online' && (state === 'idle' || state === 'file-selected') && (
           <div id="supported-formats" className="max-w-4xl mx-auto mt-16">
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
               <div className="flex items-start space-x-3">
@@ -430,7 +425,7 @@ function App() {
               </div>
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

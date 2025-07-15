@@ -19,7 +19,7 @@ export const ProcessingLoader: React.FC<ProcessingLoaderProps> = ({ stage, progr
         return {
           icon: <Loader2 className="h-6 w-6 animate-spin" />,
           title: 'Processing Document',
-          description: 'Gemini AI is extracting content...'
+          description: 'Fineksi Lens is extracting content...'
         };
       case 'analyzing':
         return {
