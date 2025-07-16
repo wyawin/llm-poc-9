@@ -493,7 +493,7 @@ app.post('/api/extract', upload.single('document'), async (req, res) => {
           }
         } else {
           // Fallback: try to parse as simple JSON without confidence
-          const simpleJson = parseJsonFromResponse(extractedContent);
+          const simpleJson = parseJsonFromResponse(response);
           if (simpleJson) {
             responseData.jsonData = simpleJson;
             responseData.hasConfidence = false;
@@ -505,12 +505,12 @@ app.post('/api/extract', upload.single('document'), async (req, res) => {
         }
       } else {
         // For non-custom extractions, try to extract confidence score
-        const confidenceMatch = extractedContent.match(/CONFIDENCE:\s*(\d+)/i);
+        const confidenceMatch = response.match(/CONFIDENCE:\s*(\d+)/i);
         if (confidenceMatch) {
           responseData.overallConfidence = parseInt(confidenceMatch[1]);
           responseData.hasConfidence = true;
           // Remove confidence line from content
-          responseData.content = extractedContent.replace(/CONFIDENCE:\s*\d+\s*/i, '').trim();
+          responseData.content = response.replace(/CONFIDENCE:\s*\d+\s*/i, '').trim();
         }
       }
       console.log(responseData);
