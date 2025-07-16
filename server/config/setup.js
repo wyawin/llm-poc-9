@@ -22,8 +22,7 @@ export const config = {
     
     // Available Gemini models for reference
     availableModels: [
-      'gemini-2.5-flash-preview-05-20', // Latest preview model
-      'gemini-2.5-flash-preview-04-17', // Previous preview model
+      'gemini-2.5-flash',               // New Models
       'gemini-1.5-flash',               // Fast, cost-effective
       'gemini-1.5-pro',                 // High quality reasoning
       'gemini-1.5-flash-8b'             // Ultra cost-effective
