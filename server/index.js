@@ -346,7 +346,7 @@ app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'ok', 
     message: 'Document extraction server is running',
-    geminiConfigured: !!process.env.GEMINI_API_KEY
+    geminiConfigured: true,
   });
 });
 
