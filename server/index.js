@@ -459,7 +459,7 @@ app.post('/api/extract', upload.single('document'), async (req, res) => {
       
       // const response = await result.response;
       const response = extractTextFromResponse(result);
-      const extractedContent = response;
+      // const extractedContent = response;
 
       // Clean up uploaded file
       fs.unlinkSync(filePath);
