@@ -521,9 +521,9 @@ app.post('/api/extract', upload.single('document'), async (req, res) => {
         fs.unlinkSync(filePath);
       }
       
-      console.error('Gemini API Error:', geminiError);
+      console.error('Error:', geminiError);
       res.status(500).json({
-        error: 'Failed to process document with Gemini AI. Please try again.',
+        error: 'Failed to process document with Fineksi Lens. Please try again.',
         details: geminiError.message
       });
     }
