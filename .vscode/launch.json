@@ -13,7 +13,7 @@
       "type": "node-terminal",
       "request": "launch",
       "name": "Run Frontend",
-      "command": "npm run client"
+      "command": "npm run dev:client"
     },
     {
         "type": "chrome",
