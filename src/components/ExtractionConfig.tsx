@@ -402,6 +402,47 @@ export const ExtractionConfig: React.FC<ExtractionConfigProps> = ({
           // { id: '8', name: 'qrcode', description: 'Extract information about the QR Code present', type: 'text' }
         ];
         break;
+      case 'payslip':
+        presetFields = [
+          { id: '1', name: 'employee_name', description: 'Full name of the employee', type: 'text' },
+          { id: '2', name: 'employee_id', description: 'Employee ID or number', type: 'text' },
+          { id: '3', name: 'company_name', description: 'Name of the company or employer', type: 'text' },
+          { id: '4', name: 'pay_period_start', description: 'Pay period start date', type: 'date' },
+          { id: '5', name: 'pay_period_end', description: 'Pay period end date', type: 'date' },
+          { id: '6', name: 'payment_date', description: 'Date of payment', type: 'date' },
+          { id: '7', name: 'basic_salary', description: 'Basic salary amount', type: 'number' },
+          { id: '8', name: 'allowance', description: 'Total allowances', type: 'number' },
+          { id: '9', name: 'incentive', description: 'Incentive or bonus amount', type: 'number' },
+          { id: '10', name: 'tax', description: 'Tax deduction amount', type: 'number' },
+          { id: '11', name: 'government_health', description: 'Government health insurance deduction', type: 'number' },
+          { id: '12', name: 'government_pension', description: 'Government pension deduction', type: 'number' },
+          { id: '13', name: 'take_home_pay', description: 'Net take-home pay after all deductions', type: 'number' },
+          { id: '14', name: 'gross_pay', description: 'Gross pay before deductions', type: 'number' },
+          { id: '15', name: 'total_deductions', description: 'Total amount of all deductions', type: 'number' },
+          { id: '16', name: 'department', description: 'Department or division', type: 'text' },
+          { id: '17', name: 'position', description: 'Job position or title', type: 'text' },
+          {
+            id: '18',
+            name: 'earnings_breakdown',
+            description: 'Detailed breakdown of all earnings components',
+            type: 'array_object',
+            objectSchema: [
+              { id: '1', name: 'description', description: 'Description of earning type', type: 'text' },
+              { id: '2', name: 'amount', description: 'Amount of this earning', type: 'number' }
+            ]
+          },
+          {
+            id: '19',
+            name: 'deductions_breakdown',
+            description: 'Detailed breakdown of all deduction components',
+            type: 'array_object',
+            objectSchema: [
+              { id: '1', name: 'description', description: 'Description of deduction type', type: 'text' },
+              { id: '2', name: 'amount', description: 'Amount of this deduction', type: 'number' }
+            ]
+          }
+        ];
+        break;
       default:
         return;
     }
@@ -511,7 +552,8 @@ export const ExtractionConfig: React.FC<ExtractionConfigProps> = ({
           ))}
           {[
             { key: 'ktp_id_card', label: 'KTP (ID Card)', icon: FileText },
-            { key: 'npwp_tax_card', label: 'NPWP (Tax Card)', icon: FileText }
+            { key: 'npwp_tax_card', label: 'NPWP (Tax Card)', icon: FileText },
+            { key: 'payslip', label: 'Payslip', icon: FileText }
           ].map(({ key, label, icon: Icon }) => (
             <button
               key={key}
@@ -532,6 +574,8 @@ export const ExtractionConfig: React.FC<ExtractionConfigProps> = ({
           <strong>KTP (ID Card):</strong> Complete Indonesian identification card extraction including personal details, address, civil status, and document validity information.
           <br />
           <strong>NPWP (Tax Card):</strong> Indonesian tax identification card extraction including tax numbers, personal information, and issuing office details.
+          <br />
+          <strong>Payslip:</strong> Employee payroll extraction including take-home pay, basic salary, tax, government health and pension, incentives, allowances, and detailed earnings/deductions breakdown.
         </div>
       </div>
 
